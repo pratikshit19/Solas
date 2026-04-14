@@ -48,16 +48,16 @@ export default function Preferences() {
   };
 
   return (
-    <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
+    <div className="space-y-8 md:space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-lg md:text-xl font-medium text-slate-100 flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-medium text-slate-100 flex items-center gap-2">
             <Bell size={20} className="text-violet-500 shrink-0" />
             Global Constraints
           </h2>
-          <p className="text-xs md:text-sm text-slate-500 mt-1">Configure how Solas operates implicitly.</p>
+          <p className="text-[12px] md:text-sm text-slate-500 mt-1">Configure how Solas operates implicitly.</p>
         </div>
-        {saving && <span className="text-[10px] text-slate-500 uppercase flex items-center">Syncing...</span>}
+        {saving && <span className="text-[10px] text-slate-500 uppercase flex items-center bg-[#1e1e24] px-2 py-1 rounded tracking-widest font-semibold shadow-inner">Syncing</span>}
       </div>
 
       <div className="space-y-8 max-w-2xl w-full">

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,13 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Solas | Your Private Emotional Operating System",
   description: "A structured emotional growth system providing guided AI wellness coaching, emotional mapping, and personalized therapeutic frameworks.",
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0a0a0b',
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({

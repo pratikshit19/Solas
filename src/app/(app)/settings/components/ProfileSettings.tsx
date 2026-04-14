@@ -49,14 +49,14 @@ export default function ProfileSettings() {
   };
 
   return (
-    <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8 md:space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h2 className="text-lg md:text-xl font-medium text-slate-100">Public Profile</h2>
-        <p className="text-xs md:text-sm text-slate-500 mt-1">This information enables Solas to personalize your experience.</p>
+        <h2 className="text-xl md:text-2xl font-medium text-slate-100">Public Profile</h2>
+        <p className="text-[12px] md:text-sm text-slate-500 mt-1">This information enables Solas to personalize your experience.</p>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 pb-6 border-b border-[#1e1e24] text-center sm:text-left">
-         <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center text-xl md:text-2xl font-semibold text-white shadow-lg overflow-hidden relative group shrink-0">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-10 pb-10 border-b border-[#1e1e24] text-center sm:text-left">
+         <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center text-2xl md:text-3xl font-semibold text-white shadow-xl overflow-hidden relative group shrink-0">
            {avatarUrl ? (
              <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
            ) : (
@@ -64,10 +64,10 @@ export default function ProfileSettings() {
            )}
          </div>
          <div className="flex-1 w-full max-w-sm">
-           <h3 className="text-sm font-medium text-slate-200">Avatar</h3>
-           <p className="text-xs text-slate-500 mt-1">Provide a URL for your profile picture.</p>
+           <h3 className="text-sm md:text-base font-medium text-slate-200">Avatar Mapping</h3>
+           <p className="text-[11px] md:text-xs text-slate-500 mt-1">Provide a URL for your profile picture vector.</p>
            <Input 
-             className="mt-3 text-xs" 
+             className="mt-3 text-[12px] h-10" 
              placeholder="https://example.com/photo.jpg" 
              value={avatarUrl}
              onChange={(e) => setAvatarUrl(e.target.value)}
@@ -75,9 +75,9 @@ export default function ProfileSettings() {
          </div>
       </div>
 
-      <div className="space-y-6 max-w-md w-full">
-        <div className="space-y-2">
-          <Label htmlFor="name">Display Name</Label>
+      <div className="space-y-8 max-w-md w-full">
+        <div className="space-y-2.5">
+          <Label htmlFor="name" className="text-[11px] md:text-xs uppercase tracking-wider text-slate-500 font-semibold">Display Identity</Label>
           <Input 
             id="name" 
             placeholder="How should Solas address you?" 

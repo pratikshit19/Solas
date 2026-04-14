@@ -14,17 +14,17 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
 
   return (
-    <div className="flex-1 w-full h-full mx-auto p-3 sm:p-6 md:p-8 overflow-y-auto">
-      <div className="max-w-5xl mx-auto flex flex-col gap-6 md:flex-row">
+    <div className="flex-1 w-full h-full mx-auto">
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-0 md:gap-8">
         
         {/* Settings Navigation */}
-        <aside className="w-full md:w-56 lg:w-64 flex-shrink-0">
+        <aside className="w-full md:w-56 lg:w-64 flex-shrink-0 sticky top-[-24px] md:relative z-20 bg-[#0a0a0b] md:bg-transparent pb-3 md:p-0 border-b md:border-b-0 border-[#1e1e24] md:border-none">
           <div className="mb-4 md:mb-8 hidden md:block">
             <h1 className="text-2xl font-semibold text-slate-100 tracking-tight">Settings</h1>
             <p className="text-sm text-slate-500 mt-1">Manage your identity and app behavior.</p>
           </div>
           
-          <nav className="flex flex-row md:flex-col gap-1.5 overflow-x-auto pb-1 md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <nav className="flex flex-row md:flex-col gap-1.5 overflow-x-auto pb-0 md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <TabButton 
               active={activeTab === 'profile'} 
               onClick={() => setActiveTab('profile')} 
@@ -53,7 +53,7 @@ export default function SettingsPage() {
         </aside>
 
         {/* Settings Content */}
-        <div className="flex-1 rounded-2xl border border-[#1e1e24] bg-[#0c0c0e] p-4 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden min-h-[500px]">
+        <div className="flex-1 rounded-none md:rounded-2xl border-x-0 md:border border-[#1e1e24] bg-[#0c0c0e] p-4 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden min-h-[500px]">
            {/* Decorative aesthetic blob */}
            <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
            

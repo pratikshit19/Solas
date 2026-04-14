@@ -93,7 +93,7 @@ export default function SanctuaryPage() {
       {/* Conversation/Welcome Container */}
       <div 
         ref={scrollRef}
-        className="flex-1 w-full overflow-y-auto px-4 md:px-0 pt-16 pb-40 md:pb-32"
+        className="flex-1 w-full overflow-y-auto px-0 md:px-0 pt-16 pb-40 md:pb-32"
       >
         {messages.length <= 1 ? (
           // Minimal Empty State

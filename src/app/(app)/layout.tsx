@@ -88,30 +88,30 @@ export default function AppLayout({
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-0 relative bg-[#0a0a0b]">
-        {/* Mobile Header */}
-        <header className="md:hidden flex items-center justify-between p-3 border-b border-[#1e1e24] bg-[#0a0a0b] z-20 sticky top-0 flex-shrink-0">
+      <div className="flex-1 flex flex-col min-h-0 relative bg-[#0a0a0b] overflow-hidden">
+        {/* Mobile Header with Safe Area support */}
+        <header className="md:hidden flex items-center justify-between px-8 pt-[calc(8px+env(safe-area-inset-top))] pb-3 border-b border-[#1e1e24] bg-[#0a0a0b]/80 backdrop-blur-md z-30 sticky top-0 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-violet-600 rounded flex items-center justify-center">
+            <div className="w-7 h-7 bg-violet-600 rounded flex items-center justify-center shadow-lg shadow-violet-500/20">
               <Shield className="text-white w-4 h-4" />
             </div>
-            <span className="text-sm font-semibold tracking-tight">Solas</span>
+            <span className="text-sm font-semibold tracking-tight text-slate-100">Solas OS</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Link href="/sanctuary" className={cn("p-1.5 rounded-md", pathname === '/sanctuary' ? "bg-[#1e1e24] text-violet-400" : "text-slate-500")}><MessageCircle size={16}/></Link>
-            <Link href="/insights" className={cn("p-1.5 rounded-md", pathname === '/insights' ? "bg-[#1e1e24] text-violet-400" : "text-slate-500")}><BarChart2 size={16}/></Link>
-            <Link href="/journal" className={cn("p-1.5 rounded-md", pathname === '/journal' ? "bg-[#1e1e24] text-violet-400" : "text-slate-500")}><BookOpen size={16}/></Link>
-            <Link href="/settings" className={cn("p-1.5 rounded-md", pathname.startsWith('/settings') ? "bg-[#1e1e24] text-violet-400" : "text-slate-500")}><Settings size={16}/></Link>
+          <div className="flex items-center gap-1.5">
+            <Link href="/sanctuary" className={cn("p-1.5 rounded-lg transition-colors", pathname === '/sanctuary' ? "bg-violet-500/10 text-violet-400" : "text-slate-500 hover:text-slate-300")}><MessageCircle size={18}/></Link>
+            <Link href="/insights" className={cn("p-1.5 rounded-lg transition-colors", pathname === '/insights' ? "bg-violet-500/10 text-violet-400" : "text-slate-500 hover:text-slate-300")}><BarChart2 size={18}/></Link>
+            <Link href="/journal" className={cn("p-1.5 rounded-lg transition-colors", pathname === '/journal' ? "bg-violet-500/10 text-violet-400" : "text-slate-500 hover:text-slate-300")}><BookOpen size={18}/></Link>
+            <Link href="/settings" className={cn("p-1.5 rounded-lg transition-colors", pathname.startsWith('/settings') ? "bg-violet-500/10 text-violet-400" : "text-slate-500 hover:text-slate-300")}><Settings size={18}/></Link>
             
             <div className="w-px h-4 bg-slate-800 mx-1"></div>
             
-            <button onClick={handleLogout} className="p-1.5 rounded-md text-slate-500 hover:text-red-400"><LogOut size={16}/></button>
+            <button onClick={handleLogout} className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 transition-colors"><LogOut size={18}/></button>
           </div>
         </header>
 
-        <div className="flex-1 overflow-hidden relative">
+        <main className="flex-1 overflow-y-auto relative contents-scroll p-8 sm:p-10 md:p-12">
           {children}
-        </div>
+        </main>
       </div>
     </div>
   );

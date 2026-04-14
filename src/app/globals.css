@@ -1,23 +1,27 @@
 @import "tailwindcss";
 
 body {
-  background-color: #020617; /* Slate 950 */
+  background-color: #0a0a0b; 
   color: #f8fafc; /* Slate 50 */
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 .glass-panel {
-  background: rgba(15, 23, 42, 0.6); /* Slate 900 with opacity */
+  background: rgba(10, 10, 11, 0.6); 
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .gradient-bg {
-  background-color: #020617;
-  background-image: radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.15), transparent 25%),
-                    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+  background-color: #0a0a0b;
+  background-image: radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.08), transparent 25%),
+                    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
   background-attachment: fixed;
   position: relative;
 }
