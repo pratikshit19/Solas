@@ -16,6 +16,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Solas | Your Private Emotional Operating System",
   description: "A structured emotional growth system providing guided AI wellness coaching, emotional mapping, and personalized therapeutic frameworks.",
+  appleWebApp: {
+    capable: true,
+    title: "Solas OS",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export const viewport: Viewport = {
