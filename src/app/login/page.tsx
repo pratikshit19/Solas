@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Shield, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { Shield, Loader2, Link as LinkIcon } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -80,10 +80,10 @@ export default function AuthPage() {
                 {error}
               </div>
             )}
-            
-            <button 
-              type="button" 
-              onClick={handleGoogleLogin} 
+
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
               disabled={googleLoading || loading}
               className="w-full py-2.5 rounded-md border border-[#27272a] bg-[#18181b] hover:bg-[#27272a] hover:border-[#3f3f46] text-slate-300 font-medium text-[13px] transition-all flex items-center justify-center gap-2"
             >
@@ -116,19 +116,29 @@ export default function AuthPage() {
                   placeholder="Email Address"
                   className="w-full bg-[#18181b] border border-[#27272a] rounded-lg px-3 py-2.5 text-[13px] focus:ring-1 focus:border-[#3f3f46] focus:ring-[#3f3f46] outline-none transition-all placeholder:text-slate-600 text-slate-200"
                 />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  className="w-full bg-[#18181b] border border-[#27272a] rounded-lg px-3 py-2.5 text-[13px] focus:ring-1 focus:border-[#3f3f46] focus:ring-[#3f3f46] outline-none transition-all placeholder:text-slate-600 text-slate-200"
-                />
+                <div className="space-y-1">
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    className="w-full bg-[#18181b] border border-[#27272a] rounded-lg px-3 py-2.5 text-[13px] focus:ring-1 focus:border-[#3f3f46] focus:ring-[#3f3f46] outline-none transition-all placeholder:text-slate-600 text-slate-200"
+                  />
+                  <div className="flex justify-end px-1">
+                    <Link
+                      href="/auth/forgot-password"
+                      className="text-[10px] text-slate-500 hover:text-slate-300 transition-colors"
+                    >
+                      Forgot Password?
+                    </Link>
+                  </div>
+                </div>
               </div>
 
-              <button 
-                type="submit" 
-                disabled={loading || googleLoading} 
+              <button
+                type="submit"
+                disabled={loading || googleLoading}
                 className="w-full py-2.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white font-semibold text-[13px] transition-colors flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 className="animate-spin" size={14} /> : (isLogin ? 'Sign In' : 'Create Account')}
