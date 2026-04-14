@@ -4,6 +4,11 @@ import React, { useState } from 'react';
 import { PenTool, Brain, History, Save, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createClient } from '@/utils/supabase/client';
+import { Button } from '@/components/ui/Button';
+import Link from 'next/link';
+import { Sparkles, Loader2, Search } from 'lucide-react';
+import { getSolasResponse } from '@/lib/ai/engine';
 
 type JournalEntry = {
   id: string;
@@ -31,6 +36,40 @@ export const GuidedJournal = () => {
   const [view, setView] = useState<'NEW' | 'HISTORY'>('NEW');
   const [entries, setEntries] = useState<JournalEntry[]>(DUMMY_ENTRIES);
   const [activeEntry, setActiveEntry] = useState<JournalEntry | null>(null);
+  const [tier, setTier] = useState<'standard' | 'sentinel'>('standard');
+  const supabase = createClient();
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      if (user.user_metadata?.tier === 'sentinel') {
+        setTier('sentinel');
+      }
+
+      const { data: journalData } = await supabase
+        .from('journal_entries')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false });
+
+      if (journalData) {
+        setEntries(journalData);
+      }
+    };
+    fetchData();
+  }, [supabase]);
+  
+  const entriesToday = entries.filter(e => {
+    const d = new Date(e.date);
+    const today = new Date();
+    return d.getDate() === today.getDate() && 
+           d.getMonth() === today.getMonth() && 
+           d.getFullYear() === today.getFullYear();
+  }).length;
+
+  const isLimitReached = tier === 'standard' && entriesToday >= 3;
 
   // Form State
   const [situation, setSituation] = useState('');
@@ -38,25 +77,65 @@ export const GuidedJournal = () => {
   const [intensity, setIntensity] = useState<number>(5);
   const [thought, setThought] = useState('');
   const [reframed, setReframed] = useState('');
+  const [isReframing, setIsReframing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleSave = () => {
+  const handleAIReframe = async () => {
     if (!situation || !thought) return;
-    
-    const newEntry: JournalEntry = {
-      id: Math.random().toString(36).substr(2, 9),
-      date: new Date().toISOString(),
-      situation,
-      emotion,
-      intensity,
-      thought,
-      reframed
-    };
-
-    setEntries([newEntry, ...entries]);
-    // Reset form
-    setSituation(''); setEmotion(''); setIntensity(5); setThought(''); setReframed('');
-    setView('HISTORY');
+    setIsReframing(true);
+    try {
+      const prompt = `Based on this situation: "${situation}" and this automatic thought: "${thought}", provide a rational cognitive reframe. Be concise and empathetic.`;
+      const response = await getSolasResponse(prompt, [], 'STOIC', tier);
+      setReframed(response.content);
+    } catch (error) {
+      console.error('Reframing failed', error);
+    } finally {
+      setIsReframing(false);
+    }
   };
+
+  const handleSave = async () => {
+    if (!situation || !thought) return;
+    setSaving(true);
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const newEntryData = {
+        user_id: user.id,
+        date: new Date().toISOString(),
+        situation,
+        emotion,
+        intensity,
+        thought,
+        reframed
+      };
+
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .insert([newEntryData])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setEntries([data, ...entries]);
+      setSituation(''); setEmotion(''); setIntensity(5); setThought(''); setReframed('');
+      setView('HISTORY');
+    } catch (error) {
+      console.error('Save failed', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const filteredEntries = entries.filter(e => 
+    e.situation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    e.emotion.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    e.thought.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 w-full h-full min-h-[500px]">
@@ -88,8 +167,17 @@ export const GuidedJournal = () => {
 
         {view === 'HISTORY' && (
           <div className="mt-4 flex-1 overflow-y-auto space-y-1 max-h-48 lg:max-h-none border border-[#1e1e24] lg:border-none p-2 lg:p-0 rounded-md">
+            <div className="relative mb-3 px-2 hidden lg:block">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" size={12} />
+              <input 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search logs..."
+                className="w-full bg-[#0c0c0e] border border-[#1e1e24] rounded-md pl-8 pr-2 py-1.5 text-[11px] outline-none text-slate-300 placeholder:text-slate-600 focus:border-[#27272a] transition-all"
+              />
+            </div>
             <h4 className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest pl-2 mb-2 hidden lg:block">Past Logs</h4>
-            {entries.map(entry => (
+            {filteredEntries.map(entry => (
               <button 
                 key={entry.id}
                 onClick={() => setActiveEntry(entry)}
@@ -111,14 +199,38 @@ export const GuidedJournal = () => {
       <div className="flex-1 overflow-hidden flex flex-col bg-[#0f0f13] border border-[#1e1e24] rounded-xl relative">
         {view === 'NEW' && (
           <div className="flex-1 overflow-y-auto p-6 md:p-10">
-            <div className="mb-10 border-b border-[#1e1e24] pb-6">
-              <h2 className="text-xl font-semibold text-slate-100 mb-1 flex items-center gap-3">
-                Cognitive Restructuring
-              </h2>
-              <p className="text-[13px] text-slate-500">Record an automatic thought and logically process it.</p>
+            <div className="mb-10 border-b border-[#1e1e24] pb-6 flex justify-between items-start">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-100 mb-1 flex items-center gap-3">
+                  Cognitive Restructuring
+                </h2>
+                <p className="text-[13px] text-slate-500">Record an automatic thought and logically process it.</p>
+              </div>
+              <div className={cn(
+                "text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded bg-[#18181b] border",
+                tier === 'sentinel' ? "text-violet-400 border-violet-500/20 shadow-[0_0_10px_-2px_rgba(139,92,246,0.3)]" : "text-slate-600 border-slate-800"
+              )}>
+                {tier === 'sentinel' ? 'Sentinel Capacity: Uncapped' : `Standard Capacity: ${entriesToday}/3 Used`}
+              </div>
             </div>
 
-            <div className="space-y-8 max-w-2xl">
+            {isLimitReached ? (
+              <div className="max-w-xl mx-auto py-20 text-center border border-dashed border-[#1e1e24] rounded-2xl bg-[#0a0a0b]/50">
+                 <div className="w-12 h-12 bg-violet-600/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-violet-500/20">
+                   <Brain className="text-violet-400 w-6 h-6" />
+                 </div>
+                 <h3 className="text-lg font-medium text-slate-200 mb-2">Daily Threshold Reached</h3>
+                 <p className="text-sm text-slate-500 mb-8 max-w-[280px] mx-auto leading-relaxed">
+                   Standard intelligence allows for 3 restructured thoughts daily. Upgrade to Sentinel for unlimited memory and high-parameter reasoning.
+                 </p>
+                 <Link href="/settings">
+                   <Button className="bg-white text-black hover:bg-slate-200 font-bold px-8 shadow-xl shadow-white/5">
+                     Upgrade to Sentinel
+                   </Button>
+                 </Link>
+              </div>
+            ) : (
+              <div className="space-y-8 max-w-2xl">
               
               {/* Situation */}
               <div className="space-y-2">
@@ -170,9 +282,19 @@ export const GuidedJournal = () => {
 
               {/* Reframing */}
               <div className="space-y-2 pt-4">
-                <label className="text-xs font-semibold text-violet-400 uppercase tracking-wider flex items-center gap-2">
-                   Rational Reframe
-                </label>
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-semibold text-violet-400 uppercase tracking-wider flex items-center gap-2">
+                     Rational Reframe
+                  </label>
+                  <button 
+                    onClick={handleAIReframe}
+                    disabled={isReframing || !situation || !thought}
+                    className="flex items-center gap-1.5 text-[10px] font-bold text-violet-400 bg-violet-600/10 px-2 py-1 rounded border border-violet-500/20 hover:bg-violet-600/20 transition-all disabled:opacity-30"
+                  >
+                    {isReframing ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                    {isReframing ? 'Synthesizing...' : 'AI Assist'}
+                  </button>
+                </div>
                 <textarea 
                   value={reframed}
                   onChange={(e) => setReframed(e.target.value)}
@@ -184,13 +306,15 @@ export const GuidedJournal = () => {
               <div className="pt-2">
                 <button 
                   onClick={handleSave} 
-                  disabled={!situation || !thought}
+                  disabled={!situation || !thought || saving}
                   className="w-full sm:w-auto py-2.5 px-6 rounded-md bg-white hover:bg-slate-200 text-black font-semibold text-[13px] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <Save size={14} /> Commit Entry
+                  {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                  {saving ? 'Committing...' : 'Commit Entry'}
                 </button>
               </div>
             </div>
+            )}
           </div>
         )}
 

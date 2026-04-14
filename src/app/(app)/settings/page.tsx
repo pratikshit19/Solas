@@ -3,12 +3,38 @@
 import React, { useState } from 'react';
 import { User as UserIcon, Shield, Bell, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import ProfileSettings from './components/ProfileSettings';
-import AccountSettings from './components/AccountSettings';
-import Preferences from './components/Preferences';
-import Billing from './components/Billing';
+
+// Standardized Absolute Imports
+import ProfileSettings from '@/app/(app)/settings/components/ProfileSettings';
+import AccountSettings from '@/app/(app)/settings/components/AccountSettings';
+import Preferences from '@/app/(app)/settings/components/Preferences';
+import Billing from '@/app/(app)/settings/components/Billing';
 
 type SettingsTab = 'profile' | 'account' | 'preferences' | 'billing';
+
+interface TabButtonProps {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+}
+
+function TabButton({ active, onClick, icon, label }: TabButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex items-center gap-2 px-4 py-2.5 rounded-lg text-[13px] md:text-sm font-medium transition-all whitespace-nowrap",
+        active 
+          ? "bg-[#1e1e24] text-violet-400 shadow-sm ring-1 ring-white/10" 
+          : "text-slate-500 hover:text-slate-300 hover:bg-[#1e1e24]/50"
+      )}
+    >
+      <span className={active ? "text-violet-400" : "text-slate-500"}>{icon}</span>
+      <span>{label}</span>
+    </button>
+  );
+}
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
@@ -18,7 +44,7 @@ export default function SettingsPage() {
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-0 md:gap-8">
         
         {/* Settings Navigation */}
-        <aside className="w-full md:w-56 lg:w-64 flex-shrink-0 sticky top-[-21px] md:relative z-20 bg-[#0a0a0b] md:bg-transparent pb-3 md:p-0 border-b md:border-b-0 border-[#1e1e24] md:border-none">
+        <aside className="w-full md:w-56 lg:w-64 flex-shrink-0 sticky top-4 md:relative z-20 bg-[#0a0a0b] md:bg-transparent pb-6 md:p-0 border-b md:border-b-0 border-[#1e1e24] md:border-none">
           <div className="mb-4 md:mb-8 hidden md:block">
             <h1 className="text-2xl font-semibold text-slate-100 tracking-tight">Settings</h1>
             <p className="text-sm text-slate-500 mt-1">Manage your identity and app behavior.</p>
@@ -51,17 +77,17 @@ export default function SettingsPage() {
                 label="Billing" 
               />
             </nav>
-            {/* Horizontal scroll hint (subtle fade) */}
+            {/* Horizontal scroll hint (subtle fade) indicator */}
             <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#0a0a0b] to-transparent pointer-events-none md:hidden"></div>
           </div>
         </aside>
 
-        {/* Settings Content */}
-        <div className="flex-1 rounded-none md:rounded-2xl border-x-0 md:border border-[#1e1e24] bg-[#0c0c0e] p-5 sm:p-6 md:p-10 shadow-2xl relative overflow-hidden min-h-[500px]">
+        {/* Settings Content Card */}
+        <div className="flex-1 rounded-none md:rounded-2xl border-x-0 md:border border-[#1e1e24] bg-[#0c0c0e] p-6 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden min-h-[500px]">
            {/* Decorative aesthetic blob */}
            <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
            
-           <div className="relative z-10 w-full">
+           <div className="relative z-10 w-full" key={activeTab}>
              {activeTab === 'profile' && <ProfileSettings />}
              {activeTab === 'account' && <AccountSettings />}
              {activeTab === 'preferences' && <Preferences />}
@@ -73,21 +99,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-
-function TabButton({ active, onClick, icon, label }: any) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "flex items-center justify-center md:justify-start gap-2 px-4 py-2 md:py-2.5 rounded-lg text-[13px] md:text-sm font-medium transition-all whitespace-nowrap",
-        active 
-          ? "bg-[#1e1e24] text-violet-400 shadow-sm ring-1 ring-white/5" 
-          : "text-slate-500 hover:text-slate-300 hover:bg-[#1e1e24]/50"
-      )}
-    >
-      <span className={active ? "text-violet-400" : "text-slate-500"}>{icon}</span>
-      <span>{label}</span>
-    </button>
-  );
-}
-

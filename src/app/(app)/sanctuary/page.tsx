@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Shield, ChevronDown } from 'lucide-react';
+import { Send, Shield, ChevronDown, Mic, MicOff, BookPlus, Loader2 } from 'lucide-react';
 import { TherapistIdentity, SYSTEM_PERSONAS } from '@/lib/ai/prompts';
-import { getSolasResponse, ChatMessage } from '@/lib/ai/engine';
+import { getSolasResponse, ChatMessage, summarizeChatToJournal } from '@/lib/ai/engine';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/client';
 
@@ -13,8 +13,91 @@ export default function SanctuaryPage() {
   const [identity, setIdentity] = useState<TherapistIdentity>('GENTLE');
   const [isTyping, setIsTyping] = useState(false);
   const [showPersonas, setShowPersonas] = useState(false);
+  const [tier, setTier] = useState<'standard' | 'sentinel'>('standard');
+  const [isListening, setIsListening] = useState(false);
+  const [committing, setCommitting] = useState(false);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  
+  const supabase = createClient();
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    const initData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      if (user.user_metadata?.tier === 'sentinel') {
+        setTier('sentinel');
+      }
+
+      // Fetch latest session messages
+      const { data: sessionData } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+
+      if (sessionData && sessionData.length > 0) {
+        setMessages(sessionData.map(d => ({ role: d.role, content: d.content })));
+      }
+    };
+    initData();
+  }, [supabase]);
+
+  // Handle STT Initialization
+  useEffect(() => {
+    if (typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0])
+          .map((result: any) => result.transcript)
+          .join('');
+        setInput(transcript);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error', event.error);
+        setIsListening(false);
+      };
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current?.start();
+      setIsListening(true);
+    }
+  };
+
+  const handleCommitToJournal = async () => {
+    if (messages.length < 2) return;
+    setCommitting(true);
+    try {
+      const summary = await summarizeChatToJournal(messages);
+      if (summary) {
+        const { data: { user } } = await supabase.auth.getUser();
+        await supabase.from('journal_entries').insert([{
+          user_id: user?.id,
+          date: new Date().toISOString(),
+          ...summary
+        }]);
+        // Visual indicator/Toast logic could go here
+        alert('Session distilled and saved to your journal.');
+      }
+    } catch (error) {
+      console.error('Commit failed', error);
+    } finally {
+      setCommitting(false);
+    }
+  };
   useEffect(() => {
     if (scrollRef.current) {
       const scrollElement = scrollRef.current;
@@ -36,15 +119,37 @@ export default function SanctuaryPage() {
     const textToSend = customMessage || input;
     if (!textToSend.trim()) return;
     
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     const userMsg: ChatMessage = { role: 'user', content: textToSend };
-    const history = [...messages, userMsg];
-    setMessages(history);
+    setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsTyping(true);
 
+    // Stop listening if active
+    if (isListening) toggleListening();
+
     try {
-      const response = await getSolasResponse(textToSend, history, identity);
-      setMessages(prev => [...prev, { role: 'assistant', content: response.content }]);
+      // Save User Message
+      await supabase.from('chat_messages').insert([{
+        user_id: user.id,
+        role: 'user',
+        content: textToSend,
+        identity
+      }]);
+
+      const response = await getSolasResponse(textToSend, [...messages, userMsg], identity, tier);
+      const assistantMsg: ChatMessage = { role: 'assistant', content: response.content };
+      setMessages(prev => [...prev, assistantMsg]);
+
+      // Save Assistant Message
+      await supabase.from('chat_messages').insert([{
+        user_id: user.id,
+        role: 'assistant',
+        content: response.content,
+        identity
+      }]);
     } catch (error) {
       setMessages(prev => [...prev, { role: 'assistant', content: "I encountered an error processing that. Could we try again?" }]);
     } finally {
@@ -61,7 +166,7 @@ export default function SanctuaryPage() {
   return (
     <div className="flex-1 flex flex-col justify-between w-full h-full mx-auto relative z-10">
       {/* Top Minimal Settings Bar */}
-      <div className="absolute top-0 left-0 w-full p-4 flex justify-center md:justify-start z-30">
+      <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-30">
           <div className="relative">
             <button 
               onClick={() => setShowPersonas(!showPersonas)}
@@ -88,12 +193,33 @@ export default function SanctuaryPage() {
               </div>
             )}
           </div>
+
+          <div className="flex items-center gap-3">
+            {messages.length > 2 && (
+              <button 
+                onClick={handleCommitToJournal}
+                disabled={committing}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-500/20 bg-violet-950/20 text-[10px] font-bold text-violet-400 uppercase tracking-widest hover:bg-violet-900/30 transition-all disabled:opacity-50"
+              >
+                {committing ? <Loader2 size={12} className="animate-spin" /> : <BookPlus size={12} />}
+                Commit Session
+              </button>
+            )}
+            <div className={cn(
+              "text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full border shadow-sm",
+              tier === 'sentinel' 
+                ? "bg-violet-950/30 text-violet-400 border-violet-500/30" 
+                : "bg-slate-900/40 text-slate-500 border-slate-800"
+            )}>
+              {tier === 'sentinel' ? 'Sentinel Intelligence' : 'Standard Intelligence'}
+            </div>
+          </div>
       </div>
 
       {/* Conversation/Welcome Container */}
       <div 
         ref={scrollRef}
-        className="flex-1 w-full overflow-y-auto px-0 md:px-0 pt-16 pb-40 md:pb-32"
+        className="flex-1 w-full"
       >
         {messages.length <= 1 ? (
           // Minimal Empty State
@@ -162,7 +288,16 @@ export default function SanctuaryPage() {
                 placeholder="Message Solas..."
                 className="flex-1 bg-transparent px-4 py-3.5 text-[14px] outline-none text-slate-200 placeholder:text-slate-600"
               />
-              <div className="pr-2">
+              <div className="pr-2 flex items-center gap-1.5">
+                <button 
+                  onClick={toggleListening}
+                  className={cn(
+                    "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+                    isListening ? "bg-red-500/20 text-red-400" : "bg-[#27272a] text-slate-400 hover:text-slate-200"
+                  )}
+                >
+                  {isListening ? <MicOff size={14} className="animate-pulse" /> : <Mic size={14} />}
+                </button>
                 <button 
                   onClick={() => handleSend()} 
                   disabled={!input.trim() || isTyping}

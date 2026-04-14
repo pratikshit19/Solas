@@ -90,7 +90,7 @@ export default function AppLayout({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-0 relative bg-[#0a0a0b] overflow-hidden">
         {/* Mobile Header with Safe Area support */}
-        <header className="md:hidden flex items-center justify-between px-5 pt-[calc(8px+env(safe-area-inset-top))] pb-3 border-b border-[#1e1e24] bg-[#0a0a0b]/80 backdrop-blur-md z-30 sticky top-0 flex-shrink-0">
+        <header className="md:hidden flex items-center justify-between px-4 pt-[calc(8px+env(safe-area-inset-top))] pb-3 border-b border-[#1e1e24] bg-[#0a0a0b]/80 backdrop-blur-md z-30 sticky top-0 flex-shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 bg-violet-600 rounded flex items-center justify-center shadow-lg shadow-violet-500/20">
               <Shield className="text-white w-4 h-4" />
@@ -109,7 +109,7 @@ export default function AppLayout({
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto relative contents-scroll p-5 sm:p-10 md:p-12">
+        <main className="flex-1 overflow-y-auto relative contents-scroll px-4 py-8 sm:px-10 sm:py-12 md:px-12 md:py-16">
           {children}
         </main>
       </div>

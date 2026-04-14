@@ -74,29 +74,29 @@ export default function AccountSettings() {
   return (
     <div className="space-y-8 md:space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
       <div>
-        <h2 className="text-xl md:text-2xl font-medium text-slate-100 flex items-center gap-2">
+        <h2 className="text-xl md:text-2xl font-semibold text-slate-100 tracking-tight flex items-center gap-2">
           <ShieldCheck size={20} className="text-violet-500 shrink-0" />
           Account Structure
         </h2>
-        <p className="text-[12px] md:text-sm text-slate-500 mt-1">Manage your identity credentials and core vectors.</p>
+        <p className="text-sm text-slate-500 mt-1">Manage your identity credentials and core vectors.</p>
       </div>
 
-      <div className="space-y-8 max-w-md w-full">
-        <div className="space-y-2.5">
-          <Label htmlFor="email" className="text-[11px] md:text-xs uppercase tracking-wider text-slate-500 font-semibold">Registered Email</Label>
+      <div className="space-y-6 max-w-md w-full">
+        <div className="space-y-2">
+          <Label htmlFor="email" className="text-xs uppercase tracking-wider text-slate-500 font-semibold">Registered Email</Label>
           <Input 
             id="email" 
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
             disabled 
-            className="opacity-70 bg-[#0f0f13] h-10"
+            className="opacity-70 bg-[#0f0f13] border-white/5 h-10"
           />
-          <p className="text-[11px] md:text-xs text-slate-500 mt-1">Contact support to modify your primary email vector.</p>
+          <p className="text-xs text-slate-500 mt-1">Contact support to modify your primary email vector.</p>
         </div>
 
-        <div className="pt-8 border-t border-[#1e1e24] space-y-4">
+        <div className="pt-8 border-t border-white/5 space-y-4">
           <h3 className="text-sm md:text-base font-medium text-slate-200 uppercase tracking-tight">Security Protocol</h3>
-          <p className="text-[11px] md:text-sm text-slate-400 mb-3 leading-relaxed">Ensure your cryptographic keys are rotated regularly to maintain integrity.</p>
+          <p className="text-sm text-slate-400 mb-4 leading-relaxed">Ensure your cryptographic keys are rotated regularly to maintain integrity.</p>
           
           <div className="space-y-3">
              <Button onClick={handlePasswordReset} disabled={loading || success} variant="outline" className="w-full justify-center">

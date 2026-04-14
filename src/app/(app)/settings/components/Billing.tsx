@@ -53,7 +53,7 @@ export default function Billing() {
 
       // 3. Initialize Razorpay widget
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_live_Sbx0j6mqa9EMR0',
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
         name: 'Solas OS',
@@ -93,34 +93,34 @@ export default function Billing() {
   return (
     <div className="space-y-8 md:space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
       <div>
-        <h2 className="text-xl md:text-2xl font-medium text-slate-100 flex items-center gap-2">
+        <h2 className="text-xl md:text-2xl font-semibold text-slate-100 tracking-tight flex items-center gap-2">
           <CreditCard size={20} className="text-violet-500 shrink-0" />
           Subscription Protocol
         </h2>
-        <p className="text-[12px] md:text-sm text-slate-500 mt-1">Upgrade your cognitive infrastructure with Solas Sentinel.</p>
+        <p className="text-sm text-slate-500 mt-1">Upgrade your cognitive infrastructure with Solas Sentinel.</p>
       </div>
 
       <div className="max-w-xl w-full">
         <div className="relative p-[1px] overflow-hidden rounded-2xl group transition-all">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-600/50 via-[#18181b] to-indigo-600/50 opacity-50 transition-opacity duration-500"></div>
 
-          <div className="relative bg-[#0c0c0e] rounded-2xl border border-white/5 p-6 sm:p-10 backdrop-blur-xl flex flex-col items-start gap-6 sm:gap-8">
+          <div className="relative bg-[#0c0c0e] rounded-2xl border border-white/5 p-6 sm:p-10 md:p-12 backdrop-blur-xl flex flex-col items-start gap-8">
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-4 sm:gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-4">
               <div>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <Zap size={16} className="text-yellow-400 fill-yellow-400/20 flex-shrink-0" />
-                  <h3 className="text-base sm:text-xl font-semibold text-white tracking-tight">Solas Sentinel Tier</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap size={18} className="text-yellow-400 fill-yellow-400/20 flex-shrink-0" />
+                  <h3 className="text-lg sm:text-xl font-semibold text-white tracking-tight">Solas Sentinel Tier</h3>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">Advanced cognitive analysis & infinite memory map functionality.</p>
+                <p className="text-sm text-slate-400 leading-relaxed">Advanced cognitive analysis & infinite memory map functionality.</p>
               </div>
               <div className="text-left sm:text-right flex items-baseline gap-1 sm:block shrink-0">
-                <span className="text-2xl sm:text-3xl font-bold text-white">Rs.99</span>
-                <span className="text-xs sm:text-sm text-slate-500">/mo</span>
+                <span className="text-2xl sm:text-4xl font-bold text-white tracking-tighter">Rs.99</span>
+                <span className="text-sm text-slate-500">/mo</span>
               </div>
             </div>
 
-            <div className="space-y-4 w-full border-t border-white/5 pt-6 md:pt-8">
+            <div className="space-y-4 w-full border-t border-white/5 pt-8">
               <Feature text="Advanced sentiment analysis & memory mapping" />
               <Feature text="Priority access to high-parameter reasoning" />
               <Feature text="Uncapped journal processing and insights" />
@@ -128,11 +128,11 @@ export default function Billing() {
             </div>
 
             {tier === 'sentinel' ? (
-              <div className="w-full mt-4 flex items-center justify-center gap-2 p-4 rounded-xl bg-violet-900/20 text-violet-300 border border-violet-500/20 text-sm font-medium shadow-inner shadow-violet-500/10">
+              <div className="w-full mt-4 flex items-center justify-center gap-2 p-5 rounded-xl bg-violet-900/20 text-violet-300 border border-violet-500/30 text-sm font-medium shadow-inner">
                 <ShieldCheck size={18} /> Active Subscription Validated
               </div>
             ) : (
-              <Button onClick={handleUpgrade} disabled={processing} className="w-full mt-4 bg-white text-black hover:bg-slate-200 h-12 text-sm font-semibold shadow-lg shadow-white/5 transition-all active:scale-[0.98]">
+              <Button onClick={handleUpgrade} disabled={processing} className="w-full mt-4 bg-white text-black hover:bg-slate-200 h-14 text-sm font-bold shadow-xl shadow-white/5 transition-all active:scale-[0.98]">
                 {processing ? "Launching Secure Checkout..." : "Upgrade System Access"}
               </Button>
             )}
@@ -140,7 +140,7 @@ export default function Billing() {
           </div>
         </div>
 
-        <p className="text-[10px] sm:text-[12px] text-slate-500 mt-6 text-center px-4 leading-relaxed">
+        <p className="text-xs text-slate-500 mt-8 text-center px-4 leading-relaxed max-w-md mx-auto">
           {tier === 'sentinel'
             ? "Your encrypted vector database limits are currently uncapped securely by Sentinel."
             : "Payment processing secured by Razorpay. Cancel anytime without data loss."}
@@ -152,11 +152,11 @@ export default function Billing() {
 
 function Feature({ text }: { text: string }) {
   return (
-    <div className="flex items-start gap-3 sm:gap-4">
-      <div className="mt-1 w-4 h-4 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0 shadow-inner">
-        <Check size={10} className="text-violet-400" />
+    <div className="flex items-start gap-4">
+      <div className="mt-1 w-5 h-5 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+        <Check size={12} className="text-violet-400" />
       </div>
-      <p className="text-[13px] sm:text-base text-slate-300 leading-relaxed">{text}</p>
+      <p className="text-sm sm:text-base text-slate-300 leading-relaxed">{text}</p>
     </div>
   )
 }
