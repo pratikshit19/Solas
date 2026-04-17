@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Shield, MessageCircle, BarChart2, BookOpen, AlertCircle, LogOut, Settings } from 'lucide-react';
+import { Shield, MessageCircle, BarChart2, BookOpen, AlertCircle, LogOut, Settings, Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter, usePathname } from 'next/navigation';
@@ -54,6 +54,7 @@ export default function AppLayout({
           <nav className="space-y-1">
             <SidebarItem active={pathname === '/sanctuary'} href="/sanctuary" icon={<MessageCircle size={16} />} label="Sanctuary" />
             <SidebarItem active={pathname === '/insights'} href="/insights" icon={<BarChart2 size={16} />} label="Insights" />
+            <SidebarItem active={pathname === '/mindset'} href="/mindset" icon={<Brain size={16} />} label="Mindset" />
             <SidebarItem active={pathname === '/journal'} href="/journal" icon={<BookOpen size={16} />} label="Journal" />
             <SidebarItem active={pathname.startsWith('/settings')} href="/settings" icon={<Settings size={16} />} label="Settings" />
           </nav>
@@ -100,6 +101,7 @@ export default function AppLayout({
           <div className="flex items-center gap-1.5">
             <Link href="/sanctuary" className={cn("p-1.5 rounded-lg transition-colors", pathname === '/sanctuary' ? "bg-violet-500/10 text-violet-400" : "text-slate-500 hover:text-slate-300")}><MessageCircle size={18}/></Link>
             <Link href="/insights" className={cn("p-1.5 rounded-lg transition-colors", pathname === '/insights' ? "bg-violet-500/10 text-violet-400" : "text-slate-500 hover:text-slate-300")}><BarChart2 size={18}/></Link>
+            <Link href="/mindset" className={cn("p-1.5 rounded-lg transition-colors", pathname === '/mindset' ? "bg-violet-500/10 text-violet-400" : "text-slate-500 hover:text-slate-300")}><Brain size={18}/></Link>
             <Link href="/journal" className={cn("p-1.5 rounded-lg transition-colors", pathname === '/journal' ? "bg-violet-500/10 text-violet-400" : "text-slate-500 hover:text-slate-300")}><BookOpen size={18}/></Link>
             <Link href="/settings" className={cn("p-1.5 rounded-lg transition-colors", pathname.startsWith('/settings') ? "bg-violet-500/10 text-violet-400" : "text-slate-500 hover:text-slate-300")}><Settings size={18}/></Link>
             
